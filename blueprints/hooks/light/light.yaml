@@ -64,6 +64,7 @@ blueprint:
             - Xiaomi WXCJKG13LM Aqara Opple 6 button remote (#2)
             - Xiaomi WXCJKG13LM Aqara Opple 6 button remote (#3)
             - Xiaomi WXKG01LM Mi Wireless Switch
+            - ZG-101Z/D Zigbee Touch Dimmer
     light:
       name: (Required) Light
       description: Light which will be controlled with this automation.
@@ -362,19 +363,49 @@ variables:
     Xiaomi WXKG01LM Mi Wireless Switch:
       toggle: button_short
       color_up: button_double
+    ZG-101Z/D Zigbee Touch Dimmer:
+      toggle: command:single
+      brightness_up_repeat: command:rotate_right
+      brightness_down_repeat: command:rotate_left
+      color_up_repeat: event:rotate_right
+      color_down_repeat: event:rotate_left
   # pre-choose actions for buttons based on configured controller
   # no need to perform this task at automation runtime
-  brightness_up: '{{ controller_mapping[controller_model]["brightness_up"] | default(None) }}'
-  brightness_up_repeat: '{{ controller_mapping[controller_model]["brightness_up_repeat"] | default(None) }}'
-  brightness_down: '{{ controller_mapping[controller_model]["brightness_down"] | default(None) }}'
-  brightness_down_repeat: '{{ controller_mapping[controller_model]["brightness_down_repeat"] | default(None) }}'
-  color_up: '{{ controller_mapping[controller_model]["color_up"] | default(None) }}'
-  color_up_repeat: '{{ controller_mapping[controller_model]["color_up_repeat"] | default(None) }}'
-  color_down: '{{ controller_mapping[controller_model]["color_down"] | default(None) }}'
-  color_down_repeat: '{{ controller_mapping[controller_model]["color_down_repeat"] | default(None) }}'
-  toggle: '{{ controller_mapping[controller_model]["toggle"] | default(None) }}'
-  turn_on: '{{ controller_mapping[controller_model]["turn_on"] | default(None) }}'
-  turn_off: '{{ controller_mapping[controller_model]["turn_off"] | default(None) }}'
+  action: '{{ trigger.event.data.action }}'
+  operation_mode: '{{ trigger.event.data.operation_mode | default("command") }}'
+  brightness_up: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["brightness_up"] == key %} {{ action }} {% endif %}
+  brightness_up_repeat: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["brightness_up_repeat"] == key %} {{ action }} {% endif %}
+  brightness_down: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["brightness_down"] == key %} {{ action }} {% endif %}
+  brightness_down_repeat: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["brightness_down_repeat"] == key %} {{ action }} {% endif %}
+  color_up: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["color_up"] == key %} {{ action }} {% endif %}
+  color_up_repeat: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["color_up_repeat"] == key %} {{ action }} {% endif %}
+  color_down: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["color_down"] == key %} {{ action }} {% endif %}
+  color_down_repeat: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["color_down_repeat"] == key %} {{ action }} {% endif %}
+  toggle: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["toggle"] == key %} {{ action }} {% endif %}
+  turn_on: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["turn_on"] == key %} {{ action }} {% endif %}
+  turn_off: >-
+    {% set key = operation_mode ~ ":" ~ action %}
+    {% if controller_mapping[controller_model]["turn_off"] == key %} {{ action }} {% endif %}
   light_color_mode: !input light_color_mode
   light: !input light
   light_transition: !input light_transition
